@@ -1,0 +1,98 @@
+#include <SPI.h>
+#include <Ethernet.h>
+#include "SDS011.h"
+#include <Wire.h>
+#include "SparkFun_ENS160.h"
+#include <Adafruit_AHTX0.h>
+
+// Network settings
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 8, 124); // Change to your desired IP address
+// 192.168.8.125
+IPAddress serverIP(192, 168, 8, 125); // Destination server IP
+int serverPort = 5000; // Destination server port
+
+EthernetClient client;
+
+// Variables to store sensor data
+// float p10, p25;
+// SDS011 my_sds;
+SparkFun_ENS160 myENS;
+Adafruit_AHTX0 myAHT;
+
+void setup() {
+  // Start Ethernet
+  Ethernet.begin(mac, ip);
+  Serial.begin(9600);
+
+  // Initialize sensors
+  //my_sds.begin(2, 3); // Change pin numbers if needed
+  delay(5000); // Allow SDS011 to stabilize
+
+  myENS.begin();
+  myAHT.begin();
+
+  myENS.setOperatingMode(SFE_ENS160_RESET);
+  delay(100);
+  myENS.setOperatingMode(SFE_ENS160_STANDARD);
+
+  Serial.println("Sensors and Ethernet initialized");
+}
+
+void loop() {
+  // Read sensor data
+  // my_sds.read(&p25, &p10);
+  sensors_event_t humidity, temp;
+  myAHT.getEvent(&humidity, &temp);
+
+  float tvocPPB = myENS.getTVOC();
+  float tvocMgM3 = tvocPPB * 1.96e-3;
+  float eco2 = myENS.getECO2();
+  float aqi = myENS.getAQI();
+
+  // Create the JSON payload
+  String jsonData = "{";
+  jsonData += "\"aqi\": " + String(aqi) + ",";
+  jsonData += "\"temperature\": " + String(temp.temperature) + ",";
+  jsonData += "\"humidity\": " + String(humidity.relative_humidity) + ",";
+  jsonData += "\"tvoc_mg_m3\": " + String(tvocMgM3, 5) + ",";
+  jsonData += "\"eco2\": " + String(eco2);
+  jsonData += "}";
+
+  // Send the POST request
+  if (client.connect(serverIP, serverPort)) {
+    Serial.println("Connected to server");
+    Serial.println(jsonData);
+
+    // Create the HTTP POST request
+    // Create the entire HTTP request in one string
+    String httpRequest = "POST /get_data_api HTTP/1.1\r\n";
+    httpRequest += "Host: 192.168.8.114\r\n";
+    httpRequest += "Content-Type: application/json\r\n";
+    httpRequest += "Content-Length: " + String(jsonData.length()) + "\r\n";
+    httpRequest += "Connection: close\r\n"; // Optionally add this to close the connection after response
+    httpRequest += "\r\n"; // End of headers
+    httpRequest += jsonData; // Append the JSON data
+
+    // Send the entire HTTP request in a single call
+    client.println(httpRequest);
+
+
+    // Wait for server response and print it to Serial
+    // while (client.connected()) {
+    //   if (client.available()) {
+    //     char c = client.read();
+    //     Serial.print(c);
+    //   }
+    // }
+    
+    client.stop();
+    Serial.println("\nDisconnected from server");
+
+
+  } else {
+    Serial.println("Connection failed");
+  }
+
+  delay(3000); // Adjust the delay as necessary
+}
