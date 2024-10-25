@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90680653-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-90680653-2');
+    </script>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+
+    <!-- Meta -->
+    <meta name="description" content="Responsive Bootstrap 4 Dashboard Template">
+    <meta name="author" content="BootstrapDash">
+
+    <title>Air Quality detection System Readings</title>
+
+    <!-- vendor css -->
+    <link href="../lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="../lib/ionicons/css/ionicons.min.css" rel="stylesheet">
+    <link href="../lib/typicons.font/typicons.css" rel="stylesheet">
+    <link href="../lib/flag-icon-css/css/flag-icon.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <!-- GAUGE CHART CSS -->
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> 
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    
+    <!-- Google Charts Loader -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- chart script for AQI -->
+    <script src="https://cdn.zingchart.com/zingchart.min.js"></script> 
+    
+    <!-- Include the html2canvas library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+
+    <!-- azia CSS -->
+    <link rel="stylesheet" href="../css/azia.css">
+
+  </head>
+  <body>
+
+    <div class="az-header">
+      <div class="container">
+        <div class="az-header-left">
+          <a href="index.html" class="az-logo"><span></span> AirQuality</a>
+          
+        </div><!-- az-header-left -->
+
+        <div class="az-header-menu">
+          <div class="az-header-menu-header">
+            <a href="index.html" class="az-logo"><span></span> airquality</a>
+            <a href="" class="close">&times;</a>
+          </div><!-- az-header-menu-header -->
+          
+        </div>             
+
+
+               
+
+
+         
+          </div>
+        </div><!-- az-header-right -->
+      </div><!-- container -->
+    </div><!-- az-header -->
+
+    <div class="az-content az-content-dashboard">
+      <div class="container">
+        <div class="az-content-body">
+          <div class="az-dashboard-one-title">
+            <div>
+              <h2 class="az-dashboard-title">Hi, welcome back!</h2>
+              <p class="az-dashboard-text">Your locations Air-quality Sensor data are shown here!</p>
+            </div>
+
+            <div class="az-content-header-right">
+              <div class="media">
+              <div class="media-body">
+                <label>Date</label>
+                <h6 id="startDate"></h6>
+              </div><!-- media-body -->
+                </div><!-- media -->
+
+                <div class="media">
+                <div class="media-body">
+                  <label>Time</label>
+                  <h6 id="currentTime"></h6>
+                </div><!-- media-body -->
+                </div><!-- media -->
+                <script>
+                  function updateTime() {
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString();
+                    document.getElementById('currentTime').innerText = timeString;
+                  }
+
+                  // Update the time every second
+                  setInterval(updateTime, 1000);
+
+                  // Initial call to display the time immediately on page load
+                  updateTime();
+                </script>
+          
+
+              <!-- <a href="" class="btn btn-purple">Export</a> -->
+            </div>
+          </div><!-- az-dashboard-one-title -->
+
+          <div class="az-dashboard-nav"> 
+            <nav class="nav">
+              <a class="nav-link active" href="index.html">Location Geo-graphics</a>
+              <a class="nav-link" href="page-signin.html">Overview</a>
+            </nav>
+
+            <nav class="nav">
+              <!-- generate the code in javascript and html to take a screenshot of the whole web page and download it when this is clicked -->
+              <!-- <a class="nav-link" href="#"><i class="far fa-save"></i> Save Report</a> -->
+              <a class="nav-link" href="#" id="saveReportBtn"><i class="far fa-save"></i> Save Report</a>
+              <!-- <a class="nav-link" href="#"><i class="far fa-file-pdf"></i> Export to PDF</a>
+              <a class="nav-link" href="#"><i class="far fa-envelope"></i>Send to Email</a> -->
+             <a class="nav-link" href="#"><i class="fas fa-ellipsis-h"></i></a>
+            </nav>
+            
+          </div>
+          
+           <!-- City Selection Dropdown -->
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search for cities..." aria-label="Search for cities">
+            <div class="input-group-append">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+            </div>
+            <div style="margin-right: 10px;">
+            <select class="custom-select" id="citySelect" aria-label="City selection">
+              <option value="">Select a city</option>
+              <option value="Colombo">Colombo</option>
+              <option value="Galle">Galle</option>
+              <option value="Kandy">Kandy</option>
+              <option value="Nuwara Eliya">Nuwara Eliya</option>
+              <option value="Jaffna">Jaffna</option>
+              <option value="Negombo">Negombo</option>
+            </select>
+            </div>
+            
+          </div>
+
+          <!-- Display all the sensor values -->
+          <section class="stats">
+            <div class="stat-item">
+                <i class="fas fa-tachometer-alt" style="background-color: #ffeb3b; color: #ffc107; border-radius: 50%;"></i> 
+                <div class="stat-text">
+                    AQI <span>2</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-thermometer-half" style="background-color: #f8d7da; color: #dc3545; border-radius: 50%;"></i> 
+                <div class="stat-text">
+                    Temperature <span>13</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-smog" style="background-color: #d4edda; color: #28a745; border-radius: 50%;"></i> 
+                <div class="stat-text">
+                    CO <span>2</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-cloud" style="background-color: #d1ecf1; color: #17a2b8; border-radius: 50%;"></i> 
+                <div class="stat-text">
+                    CO2 <span>3</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-leaf" style="background-color: #8d8d8d; color: #3b4d5c; border-radius: 50%;"></i> 
+                <div class="stat-text">
+                    TVOC <span>2</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-cloud-sun" style="background-color: #8d8d8d; color: #3b4d5c; border-radius: 50%;"></i> 
+                <div class="stat-text">
+                    PM 2.5 <span>2</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-cloud-meatball" style="background-color: #8d8d8d; color: #3b4d5c; border-radius: 50%;"></i> 
+                <div class="stat-text">
+                    PM10 <span>2</span>
+                </div>
+            </div>
+        </section>
+             
+      </section>
+        
+
+          <div class="row row-sm mg-b-20">
+            <div class="col-lg-7 ht-lg-100p">
+              <div class="card card-dashboard-one">
+                <div class="card-header">
+
+                  <div>
+                    <h6 class="card-title">Air quality Device Metrics</h6>
+                    <p class="card-text">Collected data within air quality detection system.</p>
+                    <br>
+                  </div>
+                    <div class="btn-group">
+                    <button class="btn active" onclick="showData('day')">Day</button>
+                    <button class="btn" onclick="showData('week')">Week</button>
+                    <button class="btn" onclick="showData('month')">Month</button>
+                    </div>
+                    <script>
+                    function showData(period) {
+                      // Example data for different periods
+                      const data = {
+                      day: {
+                        devices: 56,
+                        location: 13,
+                        collectedData: 16869
+                      },
+                      week: {
+                        devices: 350,
+                        location: 90,
+                        collectedData: 120000
+                      },
+                      month: {
+                        devices: 1500,
+                        location: 400,
+                        collectedData: 500000
+                      }
+                      };
+
+                      // Update the metrics with the selected period data
+                      document.querySelector('.card-body-top div:nth-child(1) h2').innerText = data[period].devices;
+                      document.querySelector('.card-body-top div:nth-child(2) h2').innerText = data[period].location;
+                      document.querySelector('.card-body-top div:nth-child(3) h2').innerText = data[period].collectedData;
+                    }
+                    </script>
+
+                </div><!-- card-header -->
+                <div class="card-body">
+                  <div class="card-body-top">
+                    <div>
+                      <label class="mg-b-0">Devices</label>
+                      <h2>56</h2>
+                    </div>
+                    <!-- <div>
+                      <label class="mg-b-0">Accuracy</label>
+                      <h2>99.50%</h2>
+                    </div> -->
+                    <div>
+                      <label class="mg-b-0">Location</label>
+                      <h2>13</h2>
+                    </div>
+                    <div>
+                      <label class="mg-b-0">Collected data</label>
+                      <h2>16,869</h2>
+                    </div>
+                    
+                  </div><!-- card-body-top -->
+                  <div class="flot-chart-wrapper">
+                    <div id="flotChart" class="flot-chart"></div>
+                  </div><!-- flot-chart-wrapper -->
+                </div><!-- card-body -->
+              </div><!-- card -->
+            </div><!-- col -->
+          
+          
+            <div class="col-lg-5 mg-t-20 mg-lg-t-0">
+              <div class="row row-sm">
+                <div class="col-sm-6" > <!-- Increased margin-top to 40px -->
+
+                    <div class="card card-dashboard-two">
+                    <div class="card-header">
+                      <h6>AQI <i class="icon ion-md-trending-up tx-success"></i> <small>18.02%</small></h6>
+                      <p> Index </p>
+                    </div><!-- card-header -->
+
+                    <div class="card-body">
+                      <div class="chart-wrapper" style="height: 100px; margin-top: 30px;"> <!-- Increased height to 400px -->
+                        <!-- <div style="margin-top: 20px;"> -->
+                          <div id="flotChart1" class="flot-chart"></div>
+                        <!-- </div> -->
+                      </div><!-- chart-wrapper -->
+                    </div><!-- card-body -->
+                  </div><!-- card -->
+                </div><!-- col -->
+
+                <div class="col-sm-6 mg-t-20 mg-sm-t-0">
+                  <div class="card card-dashboard-two">
+                    <div class="card-header">
+                      <h6>Indoor Temp <i class="icon ion-md-trending-down tx-danger"></i> <small>0.86%</small></h6>
+                      <p>In celcius (°C )</p>
+                    </div><!-- card-header -->
+
+                    <div class="card-body">
+                      <div class="chart-wrapper">
+                        <div id="flotChart2" class="flot-chart"></div>
+                      </div><!-- chart-wrapper -->
+                    </div><!-- card-body -->
+                  </div><!-- card -->
+                </div><!-- col -->
+                
+                <!-- PM 10 and PM 2.5 Comparison Chart -->
+                <div class="col-sm-12 mg-t-20">
+                  <div class="card card-dashboard-three">
+                    <div class="card-header">
+                      <p>PM 10 and PM 2.5 Comparison</p>
+                      <!-- <small>Comparison of PM levels over a specified period across selected location.</small> -->
+                    </div><!-- card-header -->
+                    <div class="card-body">
+                      <div class="chart">
+                        
+                        <canvas id="chartBarPM"></canvas>
+                      </div>
+                    </div><!-- card-body -->
+                  </div><!-- card -->
+    </div>
+    </div>
+              
+            </div><!--col -->
+          </div><!-- row -->
+
+
+          <div class="row row-sm mg-b-10">
+            <div class="col-lg-6">
+                <div class="card card-dashboard-pageviews">
+                    <div class="card-header">
+                        <h6 class="card-title">Air Quality Data for Selected Location</h6>
+                        <p class="card-text">This report provides insights into the air quality based on real-time measurements from the selected location.</p>
+                    </div><!-- card-header -->
+                    <div class="card-body">
+                        <div class="az-list-item">
+                            <div>
+                                <h6>CO (Carbon Monoxide)</h6>
+                                <span>A colorless, odorless gas that can be harmful when inhaled in high concentrations. Safe levels are typically below 9 mg/m³.</span>
+                            </div>
+                            <div>
+                                <h6 class="tx-primary">7,755</h6>
+                                <span>mg/m³</span>
+                            </div>
+                        </div><!-- az-list-item -->
+                        
+                        <div class="az-list-item">
+                            <div>
+                                <h6>PM2.5 (Particulate Matter)</h6>
+                                <span>Tiny particles that can penetrate deep into the lungs and are linked to respiratory issues. Levels below 12 µ/m³ are considered safe.</span>
+                            </div>
+                            <div>
+                                <h6 class="tx-primary">5,215</h6>
+                                <span>µ/m³</span>
+                            </div>
+                        </div><!-- az-list-item -->
+                        
+                        <div class="az-list-item">
+                            <div>
+                                <h6>PM10 (Particulate Matter)</h6>
+                                <span>Inhalable particles that may cause health problems. Safe levels are below 54 µ/m³.</span>
+                            </div>
+                            <div>
+                                <h6 class="tx-primary">4,848</h6>
+                                <span>µ/m³</span>
+                            </div>
+                        </div><!-- az-list-item -->
+                        
+                        <div class="az-list-item">
+                            <div>
+                                <h6>Relative Humidity (RH)</h6>
+                                <span>The amount of moisture in the air, which can impact air quality. Ideal levels are generally between 30% and 60%.</span>
+                            </div>
+                            <div>
+                                <h6 class="tx-primary">65%</h6>
+                            </div>
+                        </div><!-- az-list-item -->
+                        
+                        <div class="az-list-item">
+                            <div>
+                                <h6>Total Volatile Organic Compounds (TVOC)</h6>
+                                <span>A group of organic chemicals that can affect air quality and health. Levels below 500 µg/m³ are recommended for safety.</span>
+                            </div>
+                            <div>
+                                <h6 class="tx-primary">600</h6>
+                                <span>µg/m³</span>
+                            </div>
+                        </div><!-- az-list-item -->
+                        
+                        <div class="az-list-item">
+                            <div>
+                                <h6>CO2 (Carbon Dioxide)</h6>
+                                <span>A naturally occurring gas, with safe indoor levels typically below 1,000 ppm.</span>
+                            </div>
+                            <div>
+                                <h6 class="tx-primary">420</h6>
+                                <span>ppm</span>
+                            </div>
+                        </div><!-- az-list-item -->
+                        
+                        <div class="az-list-item">
+                            <div>
+                                <h6>Air Quality Index (AQI)</h6>
+                                <span>A measure used to communicate how polluted the air currently is or how polluted it is forecast to become. An AQI of 5 indicates good air quality.</span>
+                            </div>
+                            <div>
+                                <h6 class="tx-primary">5</h6>
+                                <span>Index</span>
+                            </div>
+                        </div><!-- az-list-item -->
+                        
+                        <!-- <div class="az-list-item">
+                            <div>
+                                <h6>Health Recommendations</h6>
+                                <span>Based on the current readings, consider limiting outdoor activities if PM2.5 or PM10 levels exceed safe thresholds, and maintain good ventilation indoors.</span>
+                            </div>
+                        </div>az-list-item -->
+                        
+                    </div><!-- card-body -->
+                </div><!-- card -->
+            </div><!-- col -->
+
+                <div class="col-lg-6 mg-t-20 mg-lg-t-0">
+                <div class="row row-sm">
+                  <div class="col-sm-12">
+                  <div class="card card-dashboard-three">
+                    <div class="card-header">
+                    <p>CO and CO2 Comparison</p>
+                    <!-- <small>Comparison over a specified period across selected location.</small> -->
+                    </div><!-- card-header -->
+                    <div class="card-body">
+                    <div class="chart"> 
+                      <canvas id="chartBarCO"></canvas>
+                    </div>
+                    </div><!-- card-body -->
+                  </div><!-- card -->
+                  </div><!-- col -->
+                  
+
+                  <div class="col-sm-12 mg-t-20">
+                    <div class="card card-dashboard-three">
+                      <div class="card-header">
+                        <p>TVOC Levels Throughout the Day</p>
+                        <small>TVOC level variations based on readings taken throughout the day.<br></small>
+                      </div><!-- card-header -->
+                      <div class="card-body" style="height: 400px; padding-top: 60px; padding-left: 200px;"> <!-- Added padding-left to move the graph to the right -->
+                        <div class="chart" style="height: 100%; width: 100%;">
+                          <br>
+                          <canvas id="radarChartTVOC"></canvas>
+                        </div>
+                      </div><!-- card-body -->
+                    </div><!-- card -->
+                  </div><!-- col -->
+             
+              </div><!-- col -->
+            </div><!-- row -->
+
+            
+
+          
+          </div>
+                <div class="card card-table-one" style="width: 100%; margin: 0 auto;">
+                <h6 class="card-title">Live Sensor Data Tracking & Analytics</h6>
+                <p class="az-content-text mg-b-20">This chart provides real-time environmental data for the selected area, tracking air quality, temperature, humidity, and particulate matter. Monitor insights on any device any-where in your bank.</p>
+                
+                <div class="table-responsive"></div>
+                <table class="table">
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="searchInput" onkeyup="searchTable()" placeholder="Search for cities...">
+                    <div class="input-group-append">
+                      <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                  </div>
+                  <thead>
+                  <tr>
+                    <th class="wd-5p" style="padding: 15px;">&nbsp;</th>
+                    <th class="wd-45p" style="padding: 15px;">Location</th>
+                    <th style="padding: 15px;">Relative Humidity (RH)</th>
+                    <th style="padding: 15px;">Total Volatile Organic Compounds (TVOC)</th>
+                    <th style="padding: 15px;">CO2 (ppm)</th>
+                    <th style="padding: 15px;">Air Quality Index</th>
+                    <th style="padding: 15px;">CO (mg/m³)</th>
+                    <th style="padding: 15px;">PM2.5 (µ/m³)</th>
+                    <th style="padding: 15px;">PM10 (µ/m³)</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td style="padding: 15px;"><i class="flag-icon flag-icon-lk flag-icon-squared"></i></td>
+                    <td style="padding: 15px;"><strong>Colombo</strong></td>
+                    <td style="padding: 15px;">65%</td>
+                    <td style="padding: 15px;">600 µg/m³</td>
+                    <td style="padding: 15px;">420 ppm</td>
+                    <td style="padding: 15px;">55</td>
+                    <td style="padding: 15px;">0.6</td>
+                    <td style="padding: 15px;">30</td>
+                    <td style="padding: 15px;">25</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 15px;"><i class="flag-icon flag-icon-lk flag-icon-squared"></i></td>
+                    <td style="padding: 15px;"><strong>Galle</strong></td>
+                    <td style="padding: 15px;">70%</td>
+                    <td style="padding: 15px;">500 µg/m³</td>
+                    <td style="padding: 15px;">360 ppm</td>
+                    <td style="padding: 15px;">45</td>
+                    <td style="padding: 15px;">0.5</td>
+                    <td style="padding: 15px;">25</td>
+                    <td style="padding: 15px;">20</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 15px;"><i class="flag-icon flag-icon-lk flag-icon-squared"></i></td>
+                    <td style="padding: 15px;"><strong>Kandy</strong></td>
+                    <td style="padding: 15px;">80%</td>
+                    <td style="padding: 15px;">550 µg/m³</td>
+                    <td style="padding: 15px;">400 ppm</td>
+                    <td style="padding: 15px;">60</td>
+                    <td style="padding: 15px;">0.7</td>
+                    <td style="padding: 15px;">28</td>
+                    <td style="padding: 15px;">22</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 15px;"><i class="flag-icon flag-icon-lk flag-icon-squared"></i></td>
+                    <td style="padding: 15px;"><strong>Nuwara Eliya</strong></td>
+                    <td style="padding: 15px;">75%</td>
+                    <td style="padding: 15px;">450 µg/m³</td>
+                    <td style="padding: 15px;">340 ppm</td>
+                    <td style="padding: 15px;">50</td>
+                    <td style="padding: 15px;">0.3</td>
+                    <td style="padding: 15px;">15</td>
+                    <td style="padding: 15px;">18</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 15px;"><i class="flag-icon flag-icon-lk flag-icon-squared"></i></td>
+                    <td style="padding: 15px;"><strong>Jaffna</strong></td>
+                    <td style="padding: 15px;">60%</td>
+                    <td style="padding: 15px;">520 µg/m³</td>
+                    <td style="padding: 15px;">380 ppm</td>
+                    <td style="padding: 15px;">40</td>
+                    <td style="padding: 15px;">0.4</td>
+                    <td style="padding: 15px;">20</td>
+                    <td style="padding: 15px;">15</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 15px;"><i class="flag-icon flag-icon-lk flag-icon-squared"></i></td>
+                    <td style="padding: 15px;"><strong>Negombo</strong></td>
+                    <td style="padding: 15px;">68%</td>
+                    <td style="padding: 15px;">470 µg/m³</td>
+                    <td style="padding: 15px;">390 ppm</td>
+                    <td style="padding: 15px;">35</td>
+                    <td style="padding: 15px;">0.3</td>
+                    <td style="padding: 15px;">18</td>
+                    <td style="padding: 15px;">17</td>
+                  </tr>
+                  </tbody>
+                </table>
+                </div><!-- table-responsive -->
+              </div><!-- card -->
+            </div><!-- col-lg -->
+
+          </div><!-- row -->
+        </div><!-- az-content-body -->
+      </div>
+    </div><!-- az-content -->
+
+    <div class="az-footer ht-40">
+      <div class="container ht-100p pd-t-0-f">
+        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright ©Amana Bank PLC.</span>
+        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Made by <a href="https://www.amanabank.lk/" target="_blank">Qube.LK</a> @Amana Bank - IT Department </span>
+      </div><!-- container -->
+    </div><!-- az-footer -->
+
+
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../lib/ionicons/ionicons.js"></script>
+    <script src="../lib/jquery.flot/jquery.flot.js"></script>
+    <script src="../lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="../lib/chart.js/Chart.bundle.min.js"></script>
+    <script src="../lib/peity/jquery.peity.min.js"></script>
+
+    <script src="../js/azia.js"></script>
+    <script src="../js/chart.flot.sampledata.js"></script>
+    <script src="../js/dashboard.sampledata.js"></script>
+    <script src="../js/jquery.cookie.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      // CO and CO2 Bar Chart with Time Variations
+      var ctxCO = document.getElementById('chartBarCO').getContext('2d');
+      var coChart = new Chart(ctxCO, {
+        type: 'bar',
+        data: {
+          labels: ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM', '12 PM'], // Example times of the day
+          datasets: [
+        {
+          label: 'CO Levels',
+          backgroundColor: 'rgba(255, 99, 132, 0.5)', // Red color for CO
+          borderColor: 'rgba(255, 99, 132, 1)',
+          data: [30, 40, 28, 35, 50, 45, 33] // Example data for CO
+        },
+        {
+          label: 'CO2 Levels',
+          backgroundColor: 'rgba(54, 162, 235, 0.5)', // Blue color for CO2
+          borderColor: 'rgba(54, 162, 235, 1)',
+          data: [25, 35, 32, 40, 42, 38, 29] // Example data for CO2
+        }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+        x: {
+          display: false // Remove x-axis
+        },
+        y: {
+          display: false, // Remove y-axis
+          beginAtZero: true
+        }
+          }
+        }
+      });
+
+// TVOC Radar Chart
+var ctxTVOC = document.getElementById('radarChartTVOC').getContext('2d');
+var tvocRadarChart = new Chart(ctxTVOC, {
+  type: 'radar',
+  data: {
+    labels: ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM', '12 PM'], // Example times of the day
+    datasets: [{
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+      data: [12, 19, 14, 17, 22, 18, 16] // Example TVOC data
+    }]
+  },
+  options: {
+    responsive: false,
+    scales: {
+      r: {
+        suggestedMin: 0,
+        suggestedMax: 30
+      }
+    },
+    plugins: {
+      legend: {
+        display: false
+      }
+    }
+  }
+});
+
+     
+
+      // search in the table 
+      function searchTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.querySelector('.table tbody');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            const cityName = cells[1].textContent.toLowerCase();
+
+            if (cityName.indexOf(filter) > -1) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+
+
+      $(function(){
+        'use strict'
+
+    		var plot = $.plot('#flotChart', [{
+          data: flotSampleData3,
+          color: '#007bff',
+          lines: {
+            fillColor: { colors: [{ opacity: 0 }, { opacity: 0.2 }]}
+          }
+        },{
+          data: flotSampleData4,
+          color: '#560bd0',
+          lines: {
+            fillColor: { colors: [{ opacity: 0 }, { opacity: 0.2 }]}
+          }
+        }], {
+    			series: {
+    				shadowSize: 0,
+            lines: {
+              show: true,
+              lineWidth: 2,
+              fill: true
+            }
+    			},
+          grid: {
+            borderWidth: 0,
+            labelMargin: 8
+          },
+    			yaxis: {
+            show: true,
+    				min: 0,
+    				max: 100,
+            ticks: [[0,''],[20,'20K'],[40,'40K'],[60,'60K'],[80,'80K']],
+            tickColor: '#eee'
+    			},
+    			xaxis: {
+            show: true,
+            color: '#fff',
+            ticks: [[25,'OCT 21'],[75,'OCT 22'],[100,'OCT 23'],[125,'OCT 24']],
+          }
+        });
+
+        $.plot('#flotChart1', [{
+          data: dashData2,
+          color: '#00cccc'
+        }], {
+          series: {
+            shadowSize: 0,
+            lines: {
+              show: true,
+              lineWidth: 2,
+              fill: true,
+              fillColor: { colors: [ { opacity: 0.2 }, { opacity: 0.2 } ] }
+            }
+          },
+          grid: {
+            borderWidth: 0,
+            labelMargin: 0,
+            hoverable: true // Enable hover
+          },
+          yaxis: {
+            show: false,
+            min: 0,
+            max: 35
+          },
+          xaxis: {
+            show: false,
+            max: 50
+          }
+        });
+
+        // Tooltip for displaying values on hover
+        $('<div id="tooltip"></div>').css({
+          position: 'absolute',
+          display: 'none',
+          border: '1px solid #fdd',
+          padding: '2px',
+          'background-color': '#fee',
+          opacity: 0.80
+        }).appendTo('body');
+
+        $('#flotChart1').bind('plothover', function (event, pos, item) {
+          if (item) {
+            var x = item.datapoint[0].toFixed(2),
+          y = item.datapoint[1].toFixed(2),
+          time = new Date(item.datapoint[0] * 3600 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Convert x value to time in 24-hour format
+
+            $('#tooltip').html('Index: ' + y+ '<br>Time: ' + time)
+              .css({top: item.pageY + 5, left: item.pageX + 5})
+              .fadeIn(200);
+          } else {
+            $('#tooltip').hide();
+          }
+        });
+
+        $.plot('#flotChart2', [{
+          data: dashData2,
+          color: '#007bff'
+        }], {
+            series: {
+              shadowSize: 0,
+            bars: {
+              show: true,
+              lineWidth: 0,
+              fill: 1,
+              barWidth: .5
+            }
+            },
+          grid: {
+            borderWidth: 0,
+            labelMargin: 0,
+            hoverable: true // Enable hover
+          },
+            yaxis: {
+            show: false,
+            min: 0,
+            max: 35
+          },
+            xaxis: {
+            show: false,
+            max: 20
+          }
+          });
+
+        // Tooltip for displaying values on hover
+        $('<div id="tooltip"></div>').css({
+          position: 'absolute',
+          display: 'none',
+          border: '1px solid #fdd',
+          padding: '2px',
+          'background-color': '#fee',
+          opacity: 0.80
+        }).appendTo('body');
+
+        $('#flotChart2').bind('plothover', function (event, pos, item) {
+          if (item) {
+            var x = item.datapoint[0].toFixed(2),
+          y = item.datapoint[1].toFixed(2),
+          time = new Date(item.datapoint[0] * 3600 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Convert x value to time in 24-hour format
+
+            $('#tooltip').html('Temp: ' + y +'<br>Time: '+ time)
+              .css({top: item.pageY + 5, left: item.pageX + 5})
+              .fadeIn(200);
+          } else {
+            $('#tooltip').hide();
+          }
+        });
+
+
+        //-------------------------------------------------------------//
+
+
+        // Line chart
+        $('.peity-line').peity('line');
+
+        // Bar charts
+        $('.peity-bar').peity('bar');
+
+        // Bar charts
+        $('.peity-donut').peity('donut');
+
+      var ctx5 = document.getElementById('chartBar5').getContext('2d');
+      new Chart(ctx5, {
+        type: 'bar',
+        data: {
+          labels: [0,1,2,3,4,5,6,7],
+          datasets: [{
+            data: [2, 4, 10, 20, 45, 40, 35, 18],
+            backgroundColor: '#560bd0'
+          }, {
+            data: [3, 6, 15, 35, 50, 45, 35, 25],
+            backgroundColor: '#cad0e8'
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          tooltips: {
+            enabled: false
+          },
+          legend: {
+            display: false,
+        labels: {
+          display: false
+        }
+          },
+          scales: {
+            yAxes: [{
+        display: false,
+        ticks: {
+          beginAtZero:true,
+          fontSize: 11,
+          max: 80
+        }
+            }],
+            xAxes: [{
+        barPercentage: 0.6,
+        gridLines: {
+          color: 'rgba(0,0,0,0.08)'
+        },
+        ticks: {
+          beginAtZero:true,
+          fontSize: 11,
+          display: false
+        }
+            }]
+          }
+        }
+      });
+
+          });
+      // PM 10 and PM 2.5 Bar Chart
+      var ctxPM = document.getElementById('chartBarPM').getContext('2d');
+      var pmChart = new Chart(ctxPM, {
+        type: 'bar',
+        data: {
+          labels: ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM', '12 PM'], // Example times of the day
+          datasets: [
+            {
+              label: 'PM 10 Levels',
+              backgroundColor: '#cad0e8', // Light blue color for PM 10
+              borderColor: '#cad0e8',
+              data: [20, 25, 18, 30, 22, 28, 25] // Example data for PM 10
+            },
+            {
+              label: 'PM 2.5 Levels',
+              backgroundColor: '#560bd0', // Dark purple color for PM 2.5
+              borderColor: '#560bd0',
+              data: [15, 18, 16, 22, 20, 21, 19] // Example data for PM 2.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              display: false // Remove x-axis
+            },
+            y: {
+              display: false, // Remove y-axis
+              beginAtZero: true
+            }
+          }
+        }
+      });
+// implement save report
+document.getElementById('saveReportBtn').addEventListener('click', function() {
+    // Use html2canvas to take a screenshot of the entire webpage
+    html2canvas(document.body).then(function(canvas) {
+      // Create a download link
+      var link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'webpage-screenshot.png';  // File name for the download
+      
+      // Automatically click the link to trigger download
+      link.click();
+    });
+  });
+  // Get date
+  document.getElementById('startDate').innerText = new Date().toLocaleDateString();
+      
+    </script>
+  </body>
+</html>
